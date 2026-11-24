@@ -1,0 +1,6 @@
+{
+  "name": "OshudhGuard AI",
+  "description": "Multimodal Bangladeshi prescription decoder, loose blister-strip verifier, active-molecule clinical safety auditor, and Bangla voice medication assistant.",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
