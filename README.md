@@ -1,84 +1,174 @@
-# OshudhGuard AI
+<div align="center">
 
-**Multimodal BD Prescription Decoder, Blister-Strip Verifier, Cross-Visit Clinical Safety Auditor & Bangla Voice Medication Assistant**
+# 🛡️ OshudhGuard AI
+### **An AI Clinical Pharmacist in Every Bangladeshi Smartphone**
+*Multimodal BD Prescription Decoder • Blister-Strip Verifier • Cross-Visit Safety Auditor • Bangla Voice Assistant*
 
-Built by **Team Titans** (**Team #32** — CoU AI Hackathon 2026)  
-**Team Members:** MD. Ashiqur Rahman (Team Leader), MD. Niaj Mahamod, and MD. Tareq Rahman Munim
+[![CoU AI Hackathon 2026](https://img.shields.io/badge/CoU_AI_Hackathon_2026-Team_Titans-0F766E?style=for-the-badge)](https://github.com/cou-ai-hackathon26/team_Titans)
+[![Track](https://img.shields.io/badge/Track_01-Healthcare_%26_Wellbeing-1D4ED8?style=for-the-badge)](#)
+[![Challenge 1](https://img.shields.io/badge/Challenge_1-Cross--Visit_Audit_✓-16A34A?style=for-the-badge)](#-challenge-round-1-implementations)
+[![Challenge 2](https://img.shields.io/badge/Challenge_2-Red--Alert_Hold_✓-16A34A?style=for-the-badge)](#-challenge-round-1-implementations)
+[![Bilingual](https://img.shields.io/badge/UI_%26_Voice-EN_%2F_বাংলা-D97706?style=for-the-badge)](#)
 
----
+**Built by Team Titans** — **MD Ashiqur Rahman**, **MD. Niaj Mahamod**, and **MD. Tareq Rahman Munim**  
+**Host: Comilla University (CoU TechNova 2026)**
 
-## 1. Problem Statement & Clinical Context
-
-In Bangladesh, over 70% of outpatient consultations conclude with handwritten or shorthand-heavy prescriptions containing clinical abbreviations (`1+0+1 a/c`, `BD`, `SOS`, `Stat`). Patients routinely take these slips to busy neighborhood pharmacies where trained Grade-A pharmacists are scarce and loose, unboxed medicine blister strips are cut and dispensed without printed patient leaflets. Combined with more than 21,000 look-alike and sound-alike local brand names registered under the Directorate General of Drug Administration (DGDA), patients and low-literacy caregivers face four critical safety hazards:
-
-1. **Wrong-Drug or Wrong-Strength Dispensing:** Illegible doctor handwriting and look-alike trade names lead to incorrect medications or milligram strengths being handed over at the counter.
-2. **Cross-Visit Duplicate-Generic Overdoses:** Patients visiting multiple specialists or clinics often receive different brand names containing the exact same active generic molecule (e.g., two brands of *Esomeprazole* or *Paracetamol*), causing silent cumulative toxicity.
-3. **Unflagged Drug–Drug Interactions (DDIs) & Comorbidity Hazards:** Polypharmacy regimens frequently overlook dangerous interactions or contraindications for patients with **Kidney Disease (CKD)**, **Diabetes**, or **Pregnancy**.
-4. **Dosing Confusion & MRP Overcharging:** Elderly patients and caregivers struggle to interpret English clinical shorthand at home or verify official government Maximum Retail Prices (MRP) on cut blister strips.
-
----
-
-## 2. Solution Overview
-
-**OshudhGuard AI** is a mobile-first clinical medication safety assistant designed specifically for Bangladesh's pharmaceutical ecosystem. Rather than relying on unconstrained generative text, it combines computer vision, deterministic hybrid entity resolution against local drug data, physical blister-strip verification, cross-visit safety graph auditing, and Bangla voice synthesis inside an inspectable multi-stage pipeline.
-
-### Core Capabilities
-
-1. **Multimodal Prescription Decoding (`ScannerWorkspace.tsx`, `CameraCaptureModal.tsx`, `server.ts`):**
-   - Captures or uploads handwritten/printed prescription photos alongside optional patient comorbidity toggles (Kidney Disease, Diabetes, Pregnancy).
-   - Extracts medicine lines, dosage forms, milligram strengths, frequency schedules (`1+0+1`), meal-timing instructions (`a/c`, `p/c`), and duration.
-2. **Zero-Hallucination Hybrid Grounding (`src/engine/grounding.ts`, `src/data/dgdaDatabase.ts`, `DgdaIndexView.tsx`):**
-   - Deterministically maps raw OCR drug tokens to verified Bangladeshi brand entries, active generic molecules, therapeutic classes, and official DGDA MRPs using combined semantic, character-edit, and phonetic similarity scoring.
-   - Flags low-confidence or ambiguous tokens for human confirmation instead of guessing.
-3. **Physical Blister-Strip Verification with Readability Abstention (`src/components/BlisterVerifier.tsx`, `src/engine/imageProcessing.ts`):**
-   - Inspects photos of dispensed medicine blister foils to verify whether the physical strip matches the prescribed brand, active generic, and milligram strength (`EXACT_MATCH`, `GENERIC_SUBSTITUTE`, or `CRITICAL_MISMATCH`).
-   - **Safe Uncertainty Abstention:** Holds back red mismatch alerts when a cut, crumpled, or glare-obscured blister foil is genuinely unreadable, preventing false alarms and prompting the user to retake the photo or inspect an uncut strip.
-4. **Cross-Visit / Multi-Clinic Clinical Safety Audit (`src/engine/safetyGraph.ts`, `src/data/clinicalGraph.ts`):**
-   - Allows caregivers to add prescriptions from multiple clinics or prior visits (`PrescriptionVisit`) so duplicate-generic detection, drug–drug interaction (DDI) checks, and comorbidity warnings span across visits rather than checking a single slip in isolation.
-5. **Bangla Caregiver Card & Voice Guidance (`CaregiverCardView.tsx`, `src/engine/banglaCompiler.ts`, `src/utils/plainLanguage.ts`, `src/utils/cardExporter.ts`, `src/utils/voice.ts`):**
-   - Translates English clinical shorthand into a color-coded **Morning / Noon / Night** visual caregiver schedule card with plain-language instructions, exportable summary cards, and spoken **Bangla** audio playback.
-6. **Transparent Pipeline Inspector (`src/components/PipelineInspector.tsx`):**
-   - Exposes intermediate extraction, grounding confidence scores, safety graph edges, and verification decisions for clinical auditability and live judging inspection.
+</div>
 
 ---
 
-## 3. System Architecture & Pipeline Stages
+## 🚨 Why OshudhGuard AI Exists
 
-```text
-[Prescription Image(s) + Blister Foil Photo + Comorbidity Profile]
-                                │
-                                ▼
-   ┌─────────────────────────────────────────────────────────┐
-   │ Stage 1: Image Preprocessing & Layout Segmentation      │
-   │ (src/engine/imageProcessing.ts, server.ts)              │
-   └────────────────────────────┬────────────────────────────┘
-                                │
-                                ▼
-   ┌─────────────────────────────────────────────────────────┐
-   │ Stage 2: Multimodal Vision-Language Extraction          │
-   │ Extracts raw drug names, mg strength, dosage & timing   │
-   └────────────────────────────┬────────────────────────────┘
-                                │
-                                ▼
-   ┌─────────────────────────────────────────────────────────┐
-   │ Stage 3: Hybrid Drug Grounding & Uncertainty Gate       │
-   │ (src/engine/grounding.ts + src/data/dgdaDatabase.ts)    │
-   │ Maps trade names → active generics & official DGDA MRP  │
-   └────────────────────────────┬────────────────────────────┘
-                                │
-                ┌───────────────┴───────────────┐
-                ▼                               ▼
-┌───────────────────────────────┐ ┌───────────────────────────────┐
-│ Stage 4A: Blister-Strip CV &  │ │ Stage 4B: Cross-Visit Safety  │
-│ Readability Abstention Gate   │ │ Graph & DDI / Comorbidity     │
-│ (BlisterVerifier.tsx)         │ │ Audit (safetyGraph.ts)        │
-│ • Holds Red Alert if foil is  │ │ • Spans multi-clinic visits   │
-│   cut, damaged, or unreadable │ │ • Flags duplicate generics    │
-└───────────────┬───────────────┘ └───────────────┬───────────────┘
-                └───────────────┬───────────────┘
-                                │
-                                ▼
-   ┌─────────────────────────────────────────────────────────┐
-   │ Stage 5: Bangla Caregiver Schedule & Voice Synthesis    │
-   │ (banglaCompiler.ts, CaregiverCardView.tsx, voice.ts)    │
-   └─────────────────────────────────────────────────────────┘
+In Bangladesh, over **70% of outpatient prescriptions** are handwritten with dense clinical shorthand (`1+0+1 a/c`, `BD`, `SOS`, `HS`), while neighborhood pharmacies routinely cut and dispense **loose, unboxed blister strips** without patient leaflets. Combined with **21,000+ look-alike and sound-alike local brand names** across hundreds of manufacturers, everyday patients and low-literacy caregivers face four silent hazards:
+
+| Hazard | What Happens in Real Life | How OshudhGuard AI Stops It |
+| :--- | :--- | :--- |
+| **1. Multi-Clinic Duplicate Generics** | A patient visits two clinics and gets prescribed **Sergel 20mg** (Healthcare) and **Maxpro 20mg** (Renata)—two different brands hiding the *exact same active ingredient* (*Esomeprazole*). | Merges prescriptions across clinics into one unified active-molecule list and flags accidental double dosing. |
+| **2. Unsafe Drug & Health Conflicts** | Painkillers like **Naprosyn 500mg** (*Naproxen*) prescribed alongside **Losardil 50mg** (*Losartan*) in a patient with **Kidney Disease & Hypertension**. | Runs a Graph-RAG interaction & comorbidity audit with plain-language warnings and **Bangla audio playback**. |
+| **3. Damaged / Cut Blister Foil False Alarms** | Scissor-cut or glare-washed metallic foil strips hide half the brand imprint—causing naive AI scanners to panic with false red mismatch alarms. | Evaluates foil readability first; **holds back the red alert** when genuinely unreadable and guides the user to retake or check the full box. |
+| **4. Shorthand Confusion & Overcharging** | Caregivers cannot decode English dosing shorthand or verify official government MRP prices on loose strips. | Generates a **Morning / Noon / Night (`সকাল / দুপুর / রাত`) Bangla visual schedule** with voice readout, WhatsApp share, and official MRP bill check. |
+
+---
+
+## 🏆 Challenge Round 1 Implementations
+
+During **CoU AI Hackathon 2026 (Challenge Round 1)**, Team Titans was assigned the engineering direction **"Audit prescriptions across visits"** alongside two clinical safety challenges. Both are fully implemented and verifiable inside the app:
+
+### Challenge 1: Cross-Clinic Prescription Audit (`+ Add another clinic`)
+> *"Let a caregiver add a prescription from another clinic, so the duplicate-generic and interaction audit spans visits."*
+
+* **How It Works:**
+  1. **Scan Visit 1:** The caregiver photographs or uploads the first clinic's prescription on the **Prescription** tab (or selects a clinical preset: *Kidney*, *Heart*, *Pregnancy*).
+  2. **Add Visit 2 (`+ Add another clinic`):** Tapping **`+ Add another clinic`** lets the caregiver upload a second prescription from another doctor or clinic.
+  3. **Unified Active-Molecule Merge:** Stage 3 entity resolution maps every local brand to its verified DGDA active generic molecule, merging all visits into a single longitudinal regimen.
+  4. **Cross-Visit Graph-RAG Audit:** Stage 5 evaluates the combined medicine list against patient health conditions (*e.g., Kidney disease, High blood pressure*), tagging every alert with the **exact clinic name and visit date** plus a **`Listen` (Bangla TTS)** button.
+* **Live Clinical Catch Example (Patient: *Md. Abdul Karim, 62y* | Conditions: *Kidney Disease, High Blood Pressure*):**
+  * 🔴 **Same Medicine Twice:** `Sergel 20mg` + `Maxpro 20mg` → Both contain **Esomeprazole** (accidental double dosing across clinics).
+  * 🔴 **Unsafe Combination:** `Naprosyn 500mg` (*Naproxen*) + `Losardil 50mg` (*Losartan*) → Harms kidneys and impairs blood pressure control.
+  * 🔴 **Health Warning (Kidney):** `Naprosyn 500mg` *[Cumilla Medical Center, Kandirpar · 20 Nov 2026]* → NSAID contraindicated for weak kidneys.
+  * 🟡 **Health Warning (BP):** `Naprosyn 500mg` → Regular use can elevate blood pressure.
+  * 🟡 **Human-in-the-Loop Ambiguity Chooser:** Unclear handwritten lines (e.g., `5. Tab. Mns 10`) prompt the user to confirm the intended medicine rather than guessing blindly.
+
+---
+
+### Challenge 2: Hold the Red Alert on Unreadable Blister Strips
+> *"Hold the red mismatch alert when the blister foil is so damaged or cropped that the imprint is genuinely unreadable."*
+
+* **Why Honest Abstention Matters:** A false red alarm destroys user trust, while calling an unreadable strip "safe" is dangerous. OshudhGuard AI enforces a strict **readability gate** before classifying any strip.
+* **5-State Blister Verification Matrix (`Check Strip` Tab):**
+
+| Test Scenario | Foil Condition | System Decision | User Experience & Action |
+| :--- | :--- | :---: | :--- |
+| **`Sergel 20mg`** | Clear imprint, exact brand & dose | 🟢 **GREEN** | Verified exact match with prescription. |
+| **`Exium 20mg`** | Clear imprint, bio-equivalent brand | 🟡 **AMBER** | Same active ingredient (*Esomeprazole 20mg*), different brand. |
+| **`Sergel 40mg`** | Clear imprint, wrong milligram strength | 🔴 **RED** | **Critical Mismatch:** Prescription says `20mg`, strip says `40mg`. |
+| **`Amdocal 5mg`** | Clear imprint, unprescribed medicine | 🔴 **RED** | **Critical Mismatch:** Medicine is not on the prescription. |
+| **`Scissor-cut foil`** | Cropped across brand name / metallic glare | ⏸️ **HELD** | **`Strip unreadable — manual check needed` (`Red alert held back`)** — prompts **Retake Photo**, **Upload Clearer Photo**, or check full box, with **Listen in Bangla** & **Anti-Glare Filter** inspection. |
+
+---
+
+## 🖥️ Four Integrated App Sections (`EN / বাংলা` Bilingual Toggle)
+
+1. **📋 Prescription:** Photograph/upload prescriptions, append additional clinics (`+ Add another clinic`), configure health conditions, resolve unclear handwriting safely, and listen to cross-visit safety alerts in Bangla.
+2. **💊 Check Strip:** Photograph loose pharmacy blister strips, inspect the CLAHE anti-glare scan, and verify brand/dose accuracy with safe red-alert abstention on damaged foils.
+3. **🗓️ Schedule (`ওষুধ খাওয়ার দৈনিক সময়সূচী`):** Auto-generates a color-coded **Morning (`সকাল`) / Noon (`দুপুর`) / Night (`রাত`)** dosage card with meal timing, duration, per-drug **`শুনুন` (Listen)** buttons, **Save Image**, **Print**, **WhatsApp Share**, and a **Pharmacy Bill Fairness Calculator** (e.g., comparing `৳947` official total vs. `৳750` lowest bio-equivalent option = **21% / `৳197` savings**).
+4. **🔍 Medicines (`Medicine Lookup`):** Fuzzy/phonetic search across Bangladeshi brands (even rough spellings like `Srgel 20` or `Seklo 20`) showing Bangla names, dosage forms, active ingredients, manufacturers, and official DGDA unit prices (`৳`).
+
+---
+
+## Six-Stage Neuro-Symbolic AI Pipeline
+
+    [Prescription Photo(s) + Blister Strip Image + Health Profile]
+                                  │
+                                  ▼
+      ┌────────────────────────────────────────────────────────┐
+      │ Stage 1 & 2: Image Preprocessing & Multimodal OCR      │
+      │ • OpenCV deskewing + Vision-Language token extraction  │
+      └───────────────────────────┬────────────────────────────┘
+                                  │
+                                  ▼
+      ┌────────────────────────────────────────────────────────┐
+      │ Stage 3: Hybrid Entity Resolution & Ambiguity Gate     │
+      │ • BGE-M3 + Levenshtein + Double-Metaphone vs DGDA DB   │
+      │ • Human-in-the-loop chooser when handwriting is unclear│
+      └───────────────────────────┬────────────────────────────┘
+                                  │
+                  ┌───────────────┴───────────────┐
+                  ▼                               ▼
+    ┌──────────────────────────────┐ ┌──────────────────────────────┐
+    │ Stage 4: Blister Verifier    │ │ Stage 5: Cross-Visit Graph   │
+    │ • CIE-LAB CLAHE anti-glare   │ │ • Merges multi-clinic visits │
+    │ • PaddleOCR foil extraction  │ │ • Duplicate generic & DDI +  │
+    │ • Abstains & holds RED alert │ │   comorbidity safety audit   │
+    │   on cut/unreadable foils    │ │                              │
+    └──────────────┬───────────────┘ └──────────────┬───────────────┘
+                   └───────────────┬────────────────┘
+                                   ▼
+      ┌────────────────────────────────────────────────────────┐
+      │ Stage 6: Bangla Schedule Compiler & Voice Synthesis    │
+      │ • Morning/Noon/Night visual card + Bangla TTS + MRP    │
+      └────────────────────────────────────────────────────────┘
+
+---
+
+## 📂 Repository Structure
+
+    .
+    ├── server.ts                      # Node.js / Express backend & Gemini multimodal endpoints
+    ├── index.html                     # HTML entry point
+    ├── package.json                   # Scripts & dependencies
+    ├── tsconfig.json                  # TypeScript configuration
+    ├── vite.config.ts                 # Vite bundler configuration
+    ├── .env.example                   # Environment template (placeholders only)
+    └── src/
+        ├── App.tsx                    # Main application shell & EN/বাংলা state
+        ├── types/clinical.ts          # Domain models (visits, meds, alerts, foil outcomes)
+        ├── data/
+        │   ├── dgdaDatabase.ts        # Bangladeshi drug catalog (brands, generics, Bangla names, MRPs)
+        │   ├── clinicalGraph.ts       # Drug-drug interaction & comorbidity knowledge graph
+        │   └── demoCases.ts           # Multi-clinic & 5-outcome blister strip test presets
+        ├── engine/
+        │   ├── grounding.ts           # Fuzzy/phonetic DGDA brand grounding & confidence gate
+        │   ├── safetyGraph.ts         # Cross-visit duplicate generic, DDI & health risk engine
+        │   ├── banglaCompiler.ts      # Bangla schedule & plain-language alert generator
+        │   ├── imageProcessing.ts     # Anti-glare & foil readability heuristics
+        │   └── *.test.ts              # Unit test suites (grounding, safetyGraph, banglaCompiler)
+        ├── components/
+        │   ├── ScannerWorkspace.tsx   # Multi-clinic prescription workspace & alert feed
+        │   ├── BlisterVerifier.tsx    # Blister-strip verifier with red-alert hold UI
+        │   ├── CaregiverCardView.tsx  # Bangla Morning/Noon/Night schedule & bill savings checker
+        │   ├── DgdaIndexView.tsx      # Searchable Bangladeshi Medicine Lookup view
+        │   ├── PipelineInspector.tsx  # Transparent stage-by-stage AI pipeline inspector
+        │   ├── CameraCaptureModal.tsx # Camera capture modal
+        │   └── TopBar.tsx             # Navigation & EN/বাংলা toggle
+        └── utils/
+            ├── plainLanguage.ts       # Patient-friendly clinical explanations
+            ├── cardExporter.ts        # Image export, print & WhatsApp share helpers
+            ├── storage.ts             # Local visit persistence
+            └── voice.ts               # Bangla voice synthesis & audio playback
+
+---
+
+## 🚀 Quick Start (Local Setup)
+
+1. **Clone the repository:**
+   `git clone https://github.com/cou-ai-hackathon26/team_Titans.git && cd team_Titans`
+
+2. **Configure environment variables:**
+   `cp .env.example .env`
+   Add your Gemini API key inside `.env` (never commit `.env` to Git):
+   - `GEMINI_API_KEY="your_gemini_api_key_here"`
+   - `APP_URL="http://localhost:3000"`
+
+3. **Install dependencies & run:**
+   `npm install && npm run dev`
+
+4. **Run automated tests:**
+   `npm test`
+
+---
+
+## 🔒 Security & AI Attribution
+
+- **Secret Hygiene:** All API keys are loaded strictly from environment variables (`.env`), excluded via `.gitignore`, and never committed to source control.
+- **AI Transparency:** Utilizes Google Gemini multimodal vision-language models (`server.ts`) paired with custom deterministic TypeScript entity grounding, Graph-RAG safety rules, CLAHE/OCR blister verification, and Bangla schedule compilation.
